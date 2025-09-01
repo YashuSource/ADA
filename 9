@@ -1,1 +1,70 @@
-
+#include <stdio.h>
+#include <stdlib.h>
+#define INF 999
+#define MAX 10
+int cost[MAX][MAX], n;
+int find(int node, int parent[]) {
+ while (parent[node] != node)
+ node = parent[node];
+ return node;
+}
+void union_ij(int i, int j, int parent[]) {
+ if (i < j)
+ parent[j] = i;
+ else
+ parent[i] = j;
+}
+void kruskal_mst() {
+ int parent[MAX], t[MAX][2];
+ int count = 0, sum = 0, k = 0;
+ for (int i = 0; i < n; i++)
+ parent[i] = i;
+ while (count < n - 1) {
+ int min = INF, u = -1, v = -1;
+ for (int i = 0; i < n; i++) {
+ for (int j = 0; j < n; j++) {
+ if (cost[i][j] < min) {
+ min = cost[i][j];
+ u = i;
+ v = j;
+ }
+ }
+ }
+ if (u == -1 || v == -1) break; 
+ int pu = find(u, parent);
+ int pv = find(v, parent);
+ if (pu != pv) {
+ t[k][0] = u;
+ t[k][1] = v;
+ k++;
+ count++;
+ sum += min;
+ union_ij(pu, pv, parent);
+ }
+ cost[u][v] = cost[v][u] = INF;
+ }
+ if (count == n - 1) {
+ printf("\nSpanning Tree Exists");
+ printf("\nCost of MST = %d", sum);
+ printf("\nEdges in MST:");
+ for (int i = 0; i < k; i++)
+ printf("\n%d -- %d", t[i][0], t[i][1]);
+ } else {
+ printf("\nSpanning tree does not exist");
+ }
+}
+int main() {
+ printf("\nKruskal's Algorithm - Minimum Spanning Tree\n");
+ printf("Enter number of vertices: ");
+ scanf("%d", &n);
+ printf("Enter cost adjacency matrix (0 for no edge):\n");
+ for (int i = 0; i < n; i++) {
+ for (int j = 0; j < n; j++) {
+ scanf("%d", &cost[i][j]);
+ if (cost[i][j] == 0)
+ cost[i][j] = INF;
+ }
+ }
+ kruskal_mst();
+ return 0;
+}
